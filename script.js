@@ -44,7 +44,7 @@ async function fetchSubtitles() {
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
             end: timeStringToSeconds(item.end_time),
-            text: item.text
+            text: `${item.text_cn}<br>${item.text_kr}`
         }));
 
         displaySubtitles();
