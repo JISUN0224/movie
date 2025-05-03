@@ -40,13 +40,15 @@ async function fetchSubtitles() {
     try {
         const res = await fetch('merged_zh_ko_subtitles.json');
         const raw = await res.json();
-
+        
+        // 여기가 수정된 부분입니다 - text_cn과 text_kr을 모두 처리
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
             end: timeStringToSeconds(item.end_time),
-            text: `${item.text_cn}<br>${item.text_kr}`
+            text_cn: item.text_cn || "",  // 값이 없을 경우 빈 문자열로 처리
+            text_kr: item.text_kr || ""   // 값이 없을 경우 빈 문자열로 처리
         }));
-
+        
         displaySubtitles();
     } catch (err) {
         console.error("자막 로드 오류:", err);
@@ -58,32 +60,38 @@ async function fetchSubtitles() {
 function displaySubtitles() {
     const container = document.getElementById('subtitles');
     container.innerHTML = '';
+    
     subtitles.forEach((sub, index) => {
         const div = document.createElement('div');
         div.className = 'subtitle-line';
         div.dataset.index = index;
-        div.innerHTML = sub.text;
+        
+        // 중국어와 한국어 자막을 모두 표시
+        div.innerHTML = `
+            <div class="cn-text">${sub.text_cn || ""}</div>
+            <div class="kr-text">${sub.text_kr || ""}</div>
+        `;
+        
         container.appendChild(div);
     });
 }
 
 function updateSubtitleHighlight() {
-  if (!player || !subtitles.length) return;
-
-  const currentTime = player.getCurrentTime() + 5; // 동기화 보정
-
-  subtitles.forEach((sub, index) => {
-    const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
-    const nextStart = subtitles[index + 1]?.start ?? Infinity;
-
-    if (!el) return;
-
-    if (currentTime >= sub.start && currentTime < nextStart) {
-      el.classList.add('highlight');
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      el.classList.remove('highlight');
-    }
-  });
+    if (!player || !subtitles.length) return;
+    
+    const currentTime = player.getCurrentTime() + 5; // 동기화 보정
+    
+    subtitles.forEach((sub, index) => {
+        const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
+        const nextStart = subtitles[index + 1]?.start ?? Infinity;
+        
+        if (!el) return;
+        
+        if (currentTime >= sub.start && currentTime < nextStart) {
+            el.classList.add('highlight');
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            el.classList.remove('highlight');
+        }
+    });
 }
-
