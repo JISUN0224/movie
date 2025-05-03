@@ -62,7 +62,7 @@ function displaySubtitles() {
         const div = document.createElement('div');
         div.className = 'subtitle-line';
         div.dataset.index = index;
-        div.innerText = sub.text;
+        div.innerHTML = sub.text;
         container.appendChild(div);
     });
 }
