@@ -38,7 +38,7 @@ function loadVideo() {
 
 async function fetchSubtitles() {
     try {
-        const res = await fetch('shanzhashuzhilian_cn.json');
+        const res = await fetch('merged_zh_ko_subtitles.json');
         const raw = await res.json();
 
         subtitles = raw.map(item => ({
