@@ -1,7 +1,13 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
+const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 YouTube ID를 입력하세요
+const DEFAULT_SYNC_OFFSET = 5; // 기본 싱크 오프셋 (초 단위)
 
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
+    // 입력란과 버튼 숨기기
+    const controls = document.querySelector('.controls');
+    if (controls) controls.style.display = 'none';
+    
     // 발음 버튼 이벤트 리스너
     document.body.addEventListener('click', function(e) {
         if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
@@ -12,9 +18,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // 자막 싱크 조절 컨트롤 추가
+    addSyncControls();
+    
     // 자막 데이터 자동 로드
     fetchSubtitles();
 });
+
+// 자막 싱크 조절 컨트롤 추가
+function addSyncControls() {
+    const container = document.querySelector('.container');
+    const syncControls = document.createElement('div');
+    syncControls.className = 'sync-controls';
+    syncControls.innerHTML = `
+        <div class="sync-controls-container">
+            <button id="sync-backward">◀ -1초</button>
+            <span id="sync-status">자막 싱크: ${DEFAULT_SYNC_OFFSET}초</span>
+            <button id="sync-forward">+1초 ▶</button>
+        </div>
+    `;
+    
+    // 메인 콘텐츠 영역 전에 추가
+    const mainContent = document.querySelector('.main-content');
+    container.insertBefore(syncControls, mainContent);
+    
+    // 싱크 조절 버튼 이벤트 리스너
+    let syncOffset = DEFAULT_SYNC_OFFSET;
+    document.getElementById('sync-backward').addEventListener('click', function() {
+        syncOffset -= 1;
+        updateSyncStatus(syncOffset);
+    });
+    
+    document.getElementById('sync-forward').addEventListener('click', function() {
+        syncOffset += 1;
+        updateSyncStatus(syncOffset);
+    });
+}
+
+// 싱크 상태 업데이트
+function updateSyncStatus(offset) {
+    document.getElementById('sync-status').textContent = `자막 싱크: ${offset}초`;
+}
 
 // 중국어 발음 재생 (Web Speech API 사용)
 function speakChinese(text) {
@@ -45,7 +89,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: '',
+        videoId: fixedVideoId, // 고정 비디오 ID 사용
         playerVars: {
             autoplay: 0,
             controls: 1,
@@ -54,7 +98,8 @@ function onYouTubeIframeAPIReady() {
         },
         events: {
             'onReady': () => {
-                document.getElementById('loadVideo').addEventListener('click', loadVideo);
+                // 비디오 준비되면 자동으로 로드
+                console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', fixedVideoId);
             },
             'onStateChange': (e) => {
                 if (e.data === YT.PlayerState.PLAYING) {
@@ -68,17 +113,6 @@ function onYouTubeIframeAPIReady() {
             }
         }
     });
-}
-
-// 비디오 로드 함수
-function loadVideo() {
-    const videoId = document.getElementById('videoId').value.trim();
-    if (videoId) {
-        player.loadVideoById(videoId);
-        player.pauseVideo(); // 자동 재생 방지
-    } else {
-        alert('유효한 YouTube 비디오 ID를 입력해주세요.');
-    }
 }
 
 // 자막 데이터 가져오기
@@ -173,20 +207,82 @@ function displayVocabDetail(word, pinyin, meaning, example) {
 function updateSubtitleHighlight() {
     if (!player || !subtitles.length) return;
     
-    const currentTime = player.getCurrentTime();
+    // 현재 재생 시간에 싱크 오프셋 적용
+    const syncOffset = parseInt(document.getElementById('sync-status').textContent.match(/-?\d+/)[0]) || DEFAULT_SYNC_OFFSET;
+    const currentTime = player.getCurrentTime() + syncOffset;
+    
+    let activeSubtitleFound = false;
     
     subtitles.forEach((sub, index) => {
         const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
         if (!el) return;
         
+        // 현재 자막의 시작과 끝 시간 확인
         if (currentTime >= sub.start && currentTime <= sub.end) {
             // 현재 재생 중인 자막 하이라이트
             if (!el.classList.contains('highlight')) {
                 el.classList.add('highlight');
                 el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                currentSubtitleIndex = index;
             }
-        } else {
+            activeSubtitleFound = true;
+        } else if (index !== currentSubtitleIndex) {
+            // 현재 활성화된 자막이 아니면 하이라이트 제거
             el.classList.remove('highlight');
         }
     });
+    
+    // 만약 활성화된 자막이 없고, 현재 시간이 다음 자막의 시작 시간보다 작으면
+    // 현재 활성화된 자막의 하이라이트 유지
+    if (!activeSubtitleFound && currentSubtitleIndex >= 0) {
+        const nextSubIndex = currentSubtitleIndex + 1;
+        
+        // 다음 자막이 있고, 현재 시간이 다음 자막의 시작 시간보다 작으면 하이라이트 유지
+        if (nextSubIndex < subtitles.length && currentTime < subtitles[nextSubIndex].start) {
+            // 하이라이트 유지 (아무 작업 안 함)
+        } else {
+            // 그렇지 않으면 하이라이트 제거
+            const currentEl = document.querySelector(`.subtitle-line[data-index='${currentSubtitleIndex}']`);
+            if (currentEl) {
+                currentEl.classList.remove('highlight');
+            }
+            currentSubtitleIndex = -1;
+        }
+    }
 }
+
+// 스타일 추가
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .sync-controls-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        
+        .sync-controls-container button {
+            padding: 5px 10px;
+            margin: 0 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .sync-controls-container button:hover {
+            background-color: #3367d6;
+        }
+        
+        #sync-status {
+            font-weight: bold;
+            color: #333;
+        }
+    `;
+    document.head.appendChild(style);
+});
