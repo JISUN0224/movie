@@ -85,7 +85,7 @@ function loadVideo() {
 async function fetchSubtitles() {
     try {
         // 여기에 자막 파일의 경로를 지정하세요
-        const res = await fetch('vocabulary_subtitles_1');
+        const res = await fetch('vocabulary_subtitles_1.json');
         const raw = await res.json();
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
