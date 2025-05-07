@@ -2,12 +2,6 @@ let player, subtitles = [], currentSubtitleIndex = -1;
 
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
-    // 메인 컨테이너 구조 변경
-    restructureLayout();
-    
-    // 비디오 로드 버튼 이벤트 리스너
-    document.getElementById('loadVideo').addEventListener('click', loadVideo);
-    
     // 발음 버튼 이벤트 리스너
     document.body.addEventListener('click', function(e) {
         if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
@@ -37,76 +31,6 @@ function speakChinese(text) {
         console.warn('이 브라우저는 음성 합성을 지원하지 않습니다.');
         alert('이 브라우저는 음성 합성을 지원하지 않습니다. 최신 Chrome, Firefox, Safari, Edge 등의 브라우저를 사용해주세요.');
     }
-}
-
-// 레이아웃 구조 변경
-function restructureLayout() {
-    const container = document.querySelector('.container');
-    const videoContainer = document.querySelector('.video-container');
-    const subtitleContainer = document.querySelector('.subtitle-container');
-    
-    // 컨트롤을 상단으로 이동
-    const controls = document.querySelector('.controls');
-    container.insertBefore(controls, videoContainer);
-    
-    // 메인 콘텐츠 영역 생성
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-    
-    // 왼쪽 패널 생성
-    const leftPanel = document.createElement('div');
-    leftPanel.className = 'left-panel';
-    
-    // 오른쪽 패널 생성
-    const rightPanel = document.createElement('div');
-    rightPanel.className = 'right-panel';
-    
-    // 기존 요소 이동
-    container.appendChild(mainContent);
-    mainContent.appendChild(leftPanel);
-    mainContent.appendChild(rightPanel);
-    
-    // 비디오와 자막을 왼쪽 패널로 이동
-    videoContainer.remove();
-    subtitleContainer.remove();
-    leftPanel.appendChild(videoContainer);
-    leftPanel.appendChild(subtitleContainer);
-    
-    // 어휘 정보 패널 생성
-    const vocabDetailContainer = document.createElement('div');
-    vocabDetailContainer.className = 'vocab-detail-container';
-    vocabDetailContainer.id = 'vocab-detail';
-    
-    vocabDetailContainer.innerHTML = `
-        <div class="no-vocab-selected" id="no-vocab-message">
-            <p>왼쪽의 블랭크를 클릭하면<br>어휘 정보가 여기에 표시됩니다.</p>
-        </div>
-        
-        <div id="vocab-content" style="display: none;">
-            <div class="vocab-header">
-                <h2 class="vocab-title" id="vocab-title">단어</h2>
-                <button class="pronunciation-btn" id="pronunciation-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                    </svg>
-                    발음 듣기
-                </button>
-            </div>
-            
-            <div class="vocab-content">
-                <div class="pinyin" id="vocab-pinyin">pinyin</div>
-                <div class="meaning" id="vocab-meaning">의미</div>
-                <div class="example">
-                    <div class="example-cn" id="vocab-example-cn">예문 (중국어)</div>
-                    <div class="example-kr" id="vocab-example-kr">예문 (한국어)</div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    rightPanel.appendChild(vocabDetailContainer);
 }
 
 // 시간 문자열을 초 단위로 변환
@@ -160,8 +84,8 @@ function loadVideo() {
 // 자막 데이터 가져오기
 async function fetchSubtitles() {
     try {
-        // 자막 파일 경로는 실제 환경에 맞게 조정 필요
-        const res = await fetch('vocabulary_subtitles_1.json');
+        // 여기에 자막 파일의 경로를 지정하세요
+        const res = await fetch('vocabulary_subtitles_1');
         const raw = await res.json();
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
@@ -174,7 +98,7 @@ async function fetchSubtitles() {
     } catch (err) {
         console.error("자막 로드 오류:", err);
         document.getElementById('subtitles').innerHTML =
-            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다.</div>";
+            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다. 오류: " + err.message + "</div>";
     }
 }
 
