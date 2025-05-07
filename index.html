@@ -5,16 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>중국어 학습 도구</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .sync-controls-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+      padding: 8px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+    }
+    
+    .sync-controls-container button {
+      padding: 5px 10px;
+      margin: 0 10px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .sync-controls-container button:hover {
+      background-color: #3367d6;
+    }
+    
+    #sync-status {
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .example-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    #example-pronunciation-btn {
+      font-size: 0.85em;
+      padding: 3px 8px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    #example-pronunciation-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>중국어 학습 도구</h1>
-    <div class="instructions">
-      <p></p>
-    </div>
-    <div class="controls">
-      <input type="text" id="videoId" placeholder="YouTube 비디오 ID 입력">
-      <button id="loadVideo">비디오 로드</button>
+    
+    <!-- 자막 싱크 조절 -->
+    <div class="sync-controls">
+      <div class="sync-controls-container">
+        <button id="sync-backward">◀ -1초</button>
+        <span id="sync-status">자막 싱크: 5초</span>
+        <button id="sync-forward">+1초 ▶</button>
+      </div>
     </div>
     
     <!-- 메인 콘텐츠 영역 -->
@@ -47,6 +101,10 @@
               <div class="pinyin" id="vocab-pinyin">pinyin</div>
               <div class="meaning" id="vocab-meaning">의미</div>
               <div class="example">
+                <div class="example-header">
+                  <span>예문</span>
+                  <button class="pronunciation-btn" id="example-pronunciation-btn">예문 발음 듣기</button>
+                </div>
                 <div class="example-cn" id="vocab-example-cn">예문 (중국어)</div>
                 <div class="example-kr" id="vocab-example-kr">예문 (한국어)</div>
               </div>
