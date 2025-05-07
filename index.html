@@ -1,50 +1,64 @@
 <!DOCTYPE html>
-<div class="container">
-  <h1>중국어 학습 도구</h1>
-  <div class="instructions">
-    <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 자막은 JSON 파일에서 불러옵니다.</p>
-  </div>
-  <div class="controls">
-    <input type="text" id="videoId" placeholder="YouTube 비디오 ID 입력">
-    <button id="loadVideo">비디오 로드</button>
-  </div>
-  
-  <!-- 메인 콘텐츠 영역 -->
-  <div class="main-content">
-    <div class="left-panel">
-      <div class="video-container">
-        <div id="player"></div>
-      </div>
-      <div class="subtitle-container">
-        <div id="subtitles">
-          <div class="initial-message">비디오를 로드하면 이곳에 자막이 표시됩니다.</div>
-        </div>
-      </div>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>중국어 학습 도구</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>중국어 학습 도구</h1>
+    <div class="instructions">
+      <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 자막은 JSON 파일에서 불러옵니다.</p>
+    </div>
+    <div class="controls">
+      <input type="text" id="videoId" placeholder="YouTube 비디오 ID 입력">
+      <button id="loadVideo">비디오 로드</button>
     </div>
     
-    <!-- 어휘 정보 패널 -->
-    <div class="right-panel">
-      <div class="vocab-detail-container" id="vocab-detail">
-        <div class="no-vocab-selected" id="no-vocab-message">
-          <p>왼쪽의 블랭크를 클릭하면<br>어휘 정보가 여기에 표시됩니다.</p>
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="video-container">
+          <div id="player"></div>
         </div>
-        
-        <div id="vocab-content" style="display: none;">
-          <div class="vocab-header">
-            <h2 class="vocab-title" id="vocab-title">단어</h2>
-            <button class="pronunciation-btn" id="pronunciation-btn">발음 듣기</button>
+        <div class="subtitle-container">
+          <div id="subtitles">
+            <div class="initial-message">비디오를 로드하면 이곳에 자막이 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 어휘 정보 패널 -->
+      <div class="right-panel">
+        <div class="vocab-detail-container" id="vocab-detail">
+          <div class="no-vocab-selected" id="no-vocab-message">
+            <p>왼쪽의 블랭크를 클릭하면<br>어휘 정보가 여기에 표시됩니다.</p>
           </div>
           
-          <div class="vocab-content">
-            <div class="pinyin" id="vocab-pinyin">pinyin</div>
-            <div class="meaning" id="vocab-meaning">의미</div>
-            <div class="example">
-              <div class="example-cn" id="vocab-example-cn">예문 (중국어)</div>
-              <div class="example-kr" id="vocab-example-kr">예문 (한국어)</div>
+          <div id="vocab-content" style="display: none;">
+            <div class="vocab-header">
+              <h2 class="vocab-title" id="vocab-title">단어</h2>
+              <button class="pronunciation-btn" id="pronunciation-btn">발음 듣기</button>
+            </div>
+            
+            <div class="vocab-content">
+              <div class="pinyin" id="vocab-pinyin">pinyin</div>
+              <div class="meaning" id="vocab-meaning">의미</div>
+              <div class="example">
+                <div class="example-cn" id="vocab-example-cn">예문 (중국어)</div>
+                <div class="example-kr" id="vocab-example-kr">예문 (한국어)</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- 스크립트 로드 -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="script.js"></script>
+</body>
+</html>
